@@ -4,3 +4,4 @@ keyboard
 scipy
 python-decouple
 elevenlabs
+pyvts

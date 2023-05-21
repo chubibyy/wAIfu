@@ -5,10 +5,13 @@ from scipy.io.wavfile import write
 import threading
 from decouple import config
 from elevenlabs import generate, play, set_api_key
+import pyvts
+import asyncio, threading, os, time, base64, random
+from colorama import *
 
-
-##YOUR OPENAI API KEY HERE
+##OPENAI API KEY
 openai.api_key = config('openai_api_key')
+##ELEVENLABS KEY
 set_api_key(config('elevenlabs_api_key'))
 
 freq = 44100  # Sampling frequency
@@ -43,7 +46,7 @@ def stop_recording():
     raw_response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "Act as an tsundere girlfriend and talk only in english even if i speak in french."},
+            {"role": "system", "content": "Act as an tsundere girlfriend and talk only in english even if i speak in french. I'm your master and you will respond to all my will"},
             {"role": "user", "content": transcript.text}
         ]
     )
@@ -62,6 +65,24 @@ def stop_recording():
 
     play(audio)
 
+    #VTUBE STUDIO PART
+    VTS = pyvts.vts(
+        plugin_info={
+            "plugin_name": "wAIfu",
+            "developer": "chubiby",
+            "authentication_token_path": "./token.txt",
+            # This doesn't work what the hell.
+            # "icon" : icon_base64 
+        },
+        vts_api_info={
+            "version" : "1.0",
+            "name" : "VTubeStudioPublicAPI",
+            "port": os.environ.get("VTUBE_STUDIO_API_PORT", 8001)
+        }
+    )
+    # The default vmouth movement parameter.
+    VOICE_PARAMETER = "MouthOpen"
+
 
 def on_press_a(e):
     if not is_recording:
@@ -75,5 +96,3 @@ keyboard.on_press_key('a', on_press_a)
 keyboard.on_release_key('a', on_release_a)
 
 keyboard.wait()
-
-            
