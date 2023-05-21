@@ -3,13 +3,18 @@ import sounddevice as sd
 import keyboard
 from scipy.io.wavfile import write
 import threading
+from decouple import config
+
 
 ##YOUR OPENAI API KEY HERE
-openai.api_key = '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'
+openai.api_key = config('openai_api_key')
 
 freq = 44100  # Sampling frequency
 recording = None
 is_recording = False
+
+print("------PRESS 'A' TO START THE RECORDING-----------")
+
 
 def start_recording():
     global recording
@@ -24,7 +29,7 @@ def stop_recording():
     print('Record stop')
     sd.wait()
     write('UserSpeech.wav', freq, recording)  # Save as WAV file
-    
+
     #Transcription
     audio_file= open("UserSpeech.wav", "rb")
     transcript = openai.Audio.transcribe("whisper-1", audio_file)

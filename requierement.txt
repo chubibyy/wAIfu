@@ -1,0 +1,5 @@
+openai
+sounddevice
+keyboard
+scipy
+python-decouple
