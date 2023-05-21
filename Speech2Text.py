@@ -33,7 +33,19 @@ def stop_recording():
     #Transcription
     audio_file= open("UserSpeech.wav", "rb")
     transcript = openai.Audio.transcribe("whisper-1", audio_file)
-    print (transcript)
+    print ("User transcript audio", transcript.text)
+
+    #Module conversationnal
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "Act as an tsundere girlfriend."},
+            {"role": "user", "content": transcript.text}
+        ]
+    )
+
+    print(response['choices'][0]['message']['content'])
+
 
 def on_press_a(e):
     if not is_recording:
