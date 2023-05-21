@@ -4,11 +4,12 @@ import keyboard
 from scipy.io.wavfile import write
 import threading
 from decouple import config
-from elevenlabs import generate, play
+from elevenlabs import generate, play, set_api_key
 
 
 ##YOUR OPENAI API KEY HERE
 openai.api_key = config('openai_api_key')
+set_api_key(config('elevenlabs_api_key'))
 
 freq = 44100  # Sampling frequency
 recording = None
@@ -42,7 +43,7 @@ def stop_recording():
     raw_response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "Act as an tsundere girlfriend."},
+            {"role": "system", "content": "Act as an tsundere girlfriend and talk only in english even if i speak in french."},
             {"role": "user", "content": transcript.text}
         ]
     )
