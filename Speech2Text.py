@@ -4,6 +4,7 @@ import keyboard
 from scipy.io.wavfile import write
 import threading
 from decouple import config
+from elevenlabs import generate, play
 
 
 ##YOUR OPENAI API KEY HERE
@@ -31,12 +32,14 @@ def stop_recording():
     write('UserSpeech.wav', freq, recording)  # Save as WAV file
 
     #Transcription
+    print("enter speech to text")
     audio_file= open("UserSpeech.wav", "rb")
     transcript = openai.Audio.transcribe("whisper-1", audio_file)
     print ("User transcript audio", transcript.text)
 
     #Module conversationnal
-    response = openai.ChatCompletion.create(
+    print("enter text to text")
+    raw_response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "Act as an tsundere girlfriend."},
@@ -44,7 +47,19 @@ def stop_recording():
         ]
     )
 
-    print(response['choices'][0]['message']['content'])
+    response = raw_response['choices'][0]['message']['content']
+
+    print(response)
+
+    #Module text to Speech
+    print("enter text to speech")
+    audio = generate(
+    text=response,
+    voice="Elli",
+    model="eleven_monolingual_v1"
+    )
+
+    play(audio)
 
 
 def on_press_a(e):
