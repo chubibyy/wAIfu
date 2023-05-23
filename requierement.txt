@@ -1,7 +1,0 @@
-openai
-sounddevice
-keyboard
-scipy
-python-decouple
-elevenlabs
-pyvts
