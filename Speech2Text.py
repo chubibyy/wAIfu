@@ -28,7 +28,14 @@ def start_recording():
     print('Record start')
     recording = sd.rec(int(10 * freq), samplerate=freq, channels=2)
     
-def stop_recording():
+
+plugin_info = {
+    'plugin_name': 'wAIfu',
+    'developer': 'Noop corp',
+    'authentication_token_path': './token.txt'
+}
+
+async def stop_recording():
     global is_recording
     is_recording = False
     print('Record stop')
@@ -63,36 +70,45 @@ def stop_recording():
     model="eleven_monolingual_v1"
     )
 
-    play(audio)
-
     #VTUBE STUDIO PART
-    VTS = pyvts.vts(
-        plugin_info={
-            "plugin_name": "wAIfu",
-            "developer": "chubiby",
-            "authentication_token_path": "./token.txt",
-            # This doesn't work what the hell.
-            # "icon" : icon_base64 
-        },
-        vts_api_info={
-            "version" : "1.0",
-            "name" : "VTubeStudioPublicAPI",
-            "port": os.environ.get("VTUBE_STUDIO_API_PORT", 8001)
-        }
-    )
+    # Create a new VTube Studio API Client
+    myvts = pyvts.vts(plugin_info=plugin_info)
+
+    # Connect to the VTube Studio Server
+    await myvts.connect()
+
+    # Request and use token for authentication
+    await myvts.request_authenticate_token()
+    await myvts.request_authenticate()
+
     # The default vmouth movement parameter.
     VOICE_PARAMETER = "MouthOpen"
+    await myvts.request(myvts.vts_request.requestSetParameterValue(VOICE_PARAMETER))
+
+    play(audio)
+    
+
+def main():
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())
 
 
 def on_press_a(e):
     if not is_recording:
         threading.Thread(target=start_recording).start()
-    
+
+
 def on_release_a(e):
     if is_recording:
-        stop_recording()
+        asyncio.run(stop_recording())  # Schedule stop_recording as a task
 
-keyboard.on_press_key('a', on_press_a)
-keyboard.on_release_key('a', on_release_a)
 
-keyboard.wait()
+async def run():
+    keyboard.on_press_key('a', on_press_a)
+    keyboard.on_release_key('a', on_release_a)
+
+    await asyncio.Event().wait()  # Wait indefinitely
+
+
+if __name__ == "__main__":
+    main()
