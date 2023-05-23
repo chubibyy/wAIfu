@@ -83,7 +83,7 @@ async def stop_recording():
 
     # The default vmouth movement parameter.
     VOICE_PARAMETER = "MouthOpen"
-    await myvts.request(myvts.vts_request.requestSetParameterValue(VOICE_PARAMETER))
+    await myvts.request(myvts.vts_request.requestSetParameterValue(VOICE_PARAMETER, value=0))
 
     play(audio)
     
